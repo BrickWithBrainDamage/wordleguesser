@@ -24,16 +24,25 @@
     <button id="submitSearch">Submit guess!</button>
     <div id="possibleWords"></div>
     <p id="addWords"></p>
+    <div id="comWords"></div>
+    <p id="comWordsInfo"></p>
+    <p id="computeTime"></p>
     <div id="pageBottom">
         <p>In compute mode, the most approporiate word fitting the occasion will be calculated.
             Use compute mode to find the answer.
             Turn off compute mode to extract more information.
             In a situation like
-            <span class="wordleillegal">F</span><span class="wordleCorrect">I</span><span class="wordleCorrect">G</span><span class="wordleCorrect">H</span><span class="wordleCorrect">T</span>, it can be useful to try out a
+            <span class="wordleillegal">F</span><span class="wordleCorrect">I</span><span
+                class="wordleCorrect">G</span><span class="wordleCorrect">H</span><span class="wordleCorrect">T</span>,
+            it can be useful to try out a
             word such as CRANE
             -- a word with 5 UNKNOWN letters, instead of computing all words ending in IGHT and then trying them one
             by one.
         </p>
+        <div id="inclusiveWords">
+            <input type="text" id="inclusiveWordsInput">
+            <button>Compute Inclusive Words</button>
+        </div>
         <div id="otherBtns">
             <button id="changeLength">Change Length</button>
             <button id="toggleComputeMode">Toggle Compute Mode (Compute mode on)</button>

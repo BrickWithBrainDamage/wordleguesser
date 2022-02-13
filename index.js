@@ -126,7 +126,7 @@ id('changeLength').addEventListener('click', promptLength);
 let lastTime
 function compute() {
     let t0 = performance.now()
-    queryAll('#possibleWords p').forEach(e => e.remove());
+    queryAll('#possibleWords p, #comWords p').forEach(e => e.remove());
     getLettersFromHTML();
 
     let lettersNotIn = {};
@@ -172,7 +172,7 @@ function compute() {
             }
             for (let item in lettersNotIn) {
                 let times = includeTimes(e, item);
-                if(lettersFromInput.includes(item) && !computeMode) {
+                if (lettersFromInput.includes(item) && !computeMode) {
                     if (e.includes(item)) return false;
                 }
                 if (times >= 1 && !letters.includes(item) && !lettersIn.hasOwnProperty(item)) {
@@ -192,28 +192,101 @@ function compute() {
                 return true
             })
         }
-        let currentCommonIndex = 0
-        for (let i = 0; i < results.length; i++) { //move most common words to front of array
-            if (commonWords.has(results[i])) {
-                let placeholder = results[i]
-                results[i] = results[currentCommonIndex]
-                results[currentCommonIndex] = placeholder
-                currentCommonIndex++
-            }
-        }
-
-        let wordsDiv = id('possibleWords');
-        for (let i = 0; i < 100 && i < results.length; i++) {
-            let newp = document.createElement('p');
-            newp.innerHTML = results[i];
-            if (i < currentCommonIndex) newp.style.borderColor = 'blue';
-            wordsDiv.appendChild(newp);
-        }
+        postProcess(results)
         lastTime = performance.now() - t0;
-        id('addWords').innerHTML = results.length >= 100 ? `And ${results.length - 100} more words not shown (${lastTime}MS)` : `(${lastTime}MS)`;
+        id('computeTime').innerHTML = `Request completed in ${lastTime}MS.`;
     } else {
         id('addWords').innerHTML = `No words found`;
     }
+}
+function computeWordsWithLetters() {
+    let t0 = performance.now()
+    queryAll('#possibleWords p, #comWords p').forEach(e => e.remove());
+    let allLetters = document.querySelector('#inclusiveWords input').value.split('')
+    let results = engWords.split('\n').filter(e => allLetters.every(f => e.includes(f)) && e.length == length)
+    postProcess(results)
+    id('computeTime').innerHTML = `Request completed in ${performance.now() - t0}MS.`
+}
+function postProcess(results) {
+    //then, compute how much 'points' each word is worth by seeing if it has the most common letters
+    //the more common its letters are, the more likely it is for us to stumble into a letter that is yellow or green
+    results = results.map(e => {
+        let letterScore = 0
+        let lettersEncountered = []
+        e.split('').forEach(f => {
+            if (!lettersEncountered.includes(f)) letterScore += Math.floor(letterCount[f] / 100) ?? 0
+            lettersEncountered.push(f)
+        })
+        return [e, letterScore]
+    })
+    let resultsCommonWords = []
+    for (let i = 0; i < results.length; i++) { //move most common words into their separate array
+        if (commonWords.has(results[i][0])) {
+            resultsCommonWords.push(results[i])
+            results.splice(i, 1)
+        }
+    }
+    //quicksort remaining results from high to low
+    function sort(arr) {
+        function swap(a, b) {
+            let placeholder = arr[a]
+            arr[a] = arr[b]
+            arr[b] = placeholder
+        }
+        function partition(low, high) {
+            let pivotPos = low + Math.floor((high - low) / 2)
+            let pivot = arr[pivotPos][1]
+            let i = low
+            let j = high
+            while (i <= j) {
+                try {
+                    while (arr[i][1] >= pivot) {
+                        i++
+                    }
+                } catch { }
+                do {
+                    j--
+                } while (arr[j][1] < pivot)
+                if (i <= j) {
+                    swap(i, j)
+                    if (j === pivotPos) pivotPos = i
+                }
+            }
+            swap(pivotPos, j)
+            return j
+        }
+        function quickSort(low, high) {
+            if (low < high) {
+                let partitionHappenedAt = partition(low, high)
+                quickSort(low, partitionHappenedAt)
+                quickSort(partitionHappenedAt + 1, high)
+            }
+        }
+        quickSort(0, arr.length - 1)
+    }
+    sort(results)
+
+    let wordsDiv = id('possibleWords');
+    for (let i = 0; i < 75 && i < results.length; i++) {
+        let newp = document.createElement('p');
+        newp.innerHTML = `${results[i][0]}(Score: ${results[i][1]})`;
+        wordsDiv.appendChild(newp);
+    }
+
+    sort(resultsCommonWords)
+    let comWords = id('comWords')
+    for (let i = 0; i < 50 && i < resultsCommonWords.length; i++) {
+        let newp = document.createElement('p');
+        newp.innerHTML = `${resultsCommonWords[i][0]}(Score: ${resultsCommonWords[i][1]})`;
+        newp.style.borderColor = 'blue';
+        comWords.appendChild(newp);
+    }
+    id('comWordsInfo').innerHTML = `${resultsCommonWords.length} common words, ${resultsCommonWords.length - 50 < 0 ?
+        resultsCommonWords.length :
+        50
+        } shown`
+    id('addWords').innerHTML = results.length >= 75 ? `And ${results.length - 75} more words not shown` : `${results.length} words shown`;
+
 }
 /**
  * removes elements that are changed and make the program ready for the next word to guess
@@ -266,15 +339,17 @@ siteInfo.visitedTimes++
 window.localStorage.setItem('siteInfo', JSON.stringify(siteInfo))
 
 document.addEventListener('keypress', e => e.key === 'Enter' && !document.activeElement.parentNode.classList.contains('overlayContainer') && compute());
+document.querySelector('#inclusiveWords button').addEventListener('click', computeWordsWithLetters)
 document.addEventListener('keyup', e => {
-    console.log(e.key === 'c')
     if (!document.activeElement.parentNode.classList.contains('overlayContainer'))
         e.key === 'Escape' ?
             clear() :
             e.key.toLowerCase() === 'c' && document.activeElement.tagName !== 'INPUT' ?
                 toggleComputeMode() :
-                (e.key === 'Backspace' ||
-                    /^[a-z\s]$/i.test(e.key) &&
-                    !['illegalLetters', 'lettersInWord'].includes(document.activeElement.id))
-                && focusCursor(e.key)
+                e.key.toLowerCase() == 'i' ?
+                    computeWordsWithLetters() :
+                    (e.key === 'Backspace' ||
+                        /^[a-z\s]$/i.test(e.key)) &&
+                        !['illegalLetters', 'lettersInWord', 'inclusiveWordsInput'].includes(document.activeElement.id)
+                    && focusCursor(e.key)
 });

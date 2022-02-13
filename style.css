@@ -49,13 +49,13 @@ h1 {
   text-align: center;
 }
 
-#possibleWords {
+#possibleWords, #comWords {
   display: flex;
   justify-content: center;
   width: 100%;
   flex-wrap: wrap;
 }
-#possibleWords p {
+#possibleWords p, #comWords p {
   box-sizing: content-box;
   margin: 3px;
   font-family: Raleway;
@@ -109,8 +109,13 @@ button:hover {
 
 #pageBottom {
   width: 100%;
-  position: absolute;
+  position: fixed;
   bottom: 12px;
+}
+#pageBottom #inclusiveWords {
+  bottom: 50px;
+  display: flex;
+  justify-content: center;
 }
 #pageBottom #otherBtns {
   position: relative;

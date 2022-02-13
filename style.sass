@@ -19,7 +19,7 @@ h1
             margin: 6px
     p
         text-align: center
-#possibleWords
+#possibleWords, #comWords
     display: flex
     justify-content: center
     width: 100%
@@ -67,8 +67,12 @@ button
         background-color: lighten(blue, 40%)
 #pageBottom
     width: 100%
-    position: absolute
+    position: fixed
     bottom: 12px
+    #inclusiveWords
+        bottom: 50px
+        display: flex
+        justify-content: center
     #otherBtns
         position: relative
         left: 50%
