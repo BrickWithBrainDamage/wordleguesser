@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="style.css" />
+    <script src='./words.js' defer></script>
+    <script src='./index.js' defer></script>
+    <title>Wordle Guesser</title>
+</head>
+
+<body>
+    <h1>Wordle Guesser</h1>
+    <div id="letterInfo">
+        <p>Letters are in these places (GREEN LETTERS)</p>
+        <div id="knownLetters"></div>
+        <p>These places do NOT have these letters (YELLOW LETTERS)</p>
+        <div id="knownIllegalLetters"></div>
+    </div>
+
+    <p>Letters not in word (GREY LETTERS)</p>
+    <input type="text" id="illegalLetters">
+    <button id="submitSearch">Submit guess!</button>
+    <div id="possibleWords"></div>
+    <p id="addWords"></p>
+    <div id="pageBottom">
+        <p>In compute mode, the most approporiate word fitting the occasion will be calculated.
+            Use compute mode to find the answer.
+            Turn off compute mode to extract more information.
+            In a situation like
+            <span class="wordleillegal">F</span><span class="wordleCorrect">I</span><span class="wordleCorrect">G</span><span class="wordleCorrect">H</span><span class="wordleCorrect">T</span>, it can be useful to try out a
+            word such as CRANE
+            -- a word with 5 UNKNOWN letters, instead of computing all words ending in IGHT and then trying them one
+            by one.
+        </p>
+        <div id="otherBtns">
+            <button id="changeLength">Change Length</button>
+            <button id="toggleComputeMode">Toggle Compute Mode (Compute mode on)</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
