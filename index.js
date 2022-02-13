@@ -226,35 +226,29 @@ function postProcess(results) {
             results.splice(i, 1)
         }
     }
-    //quicksort remaining results from high to low
+    //counting sort remaining results from high to low
     function sort(arr) {
-        let output = []
-        output.length = arr.length
-    
-        let max = 0
-        arr.forEach(f => {
-            if (f[1] > max) max = f[1]
-        })
-        let count = []
-        count.length = max + 1
-        count.fill(0)
+        let output = [];
+        output.length = arr.length;
 
-        arr.forEach(f => {
-            count[f[1]]++
-        })
-        for (let i = 1; i < count.length; i++) {
-            count[i] += count[i - 1]
-        }
+        let max = 0;
+        arr.forEach(f => { if (f[1] > max) max = f[1] });
+        let count = [];
+        count.length = max + 1;
+        count.fill(0);
+
+        arr.forEach(f => count[f[1]]++);
+        for (let i = 1; i < count.length; i++) count[i] += count[i - 1];
         for (let i = arr.length - 1; i >= 0; i--) {
-            output[count[arr[i][1]] - 1] = arr[i]
-            count[arr[i][1]]--
+            output[count[arr[i][1]] - 1] = arr[i];
+            count[arr[i][1]]--;
         }
-        results = []
-        for (let i = 0; i < output.length; i++) {
-            results.unshift(output[i])
-        }
+        
+        let returnVal = []
+        for (let i = 0; i < output.length; i++) returnVal.unshift(output[i]);
+        return returnVal
     }
-    sort(results)
+    results = sort(results);
 
     let wordsDiv = id('possibleWords');
     for (let i = 0; i < 75 && i < results.length; i++) {
@@ -263,7 +257,7 @@ function postProcess(results) {
         wordsDiv.appendChild(newp);
     }
 
-    sort(resultsCommonWords)
+    resultsCommonWords = sort(resultsCommonWords)
     let comWords = id('comWords')
     for (let i = 0; i < 50 && i < resultsCommonWords.length; i++) {
         let newp = document.createElement('p');
@@ -336,10 +330,10 @@ document.addEventListener('keyup', e => {
             clear() :
             e.key.toLowerCase() === 'c' && document.activeElement.tagName !== 'INPUT' ?
                 toggleComputeMode() :
-                e.key.toLowerCase() == 'i' && document.activeElement.tagName !== 'INPUT'?
+                e.key.toLowerCase() == 'i' && document.activeElement.tagName !== 'INPUT' ?
                     computeWordsWithLetters() :
                     (e.key === 'Backspace' ||
                         /^[a-z\s]$/i.test(e.key)) &&
-                        !['illegalLetters', 'lettersInWord', 'inclusiveWordsInput'].includes(document.activeElement.id)
+                    !['illegalLetters', 'lettersInWord', 'inclusiveWordsInput'].includes(document.activeElement.id)
                     && focusCursor(e.key)
 });
