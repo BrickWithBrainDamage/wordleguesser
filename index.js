@@ -228,41 +228,31 @@ function postProcess(results) {
     }
     //quicksort remaining results from high to low
     function sort(arr) {
-        function swap(a, b) {
-            let placeholder = arr[a]
-            arr[a] = arr[b]
-            arr[b] = placeholder
+        let output = []
+        output.length = arr.length
+    
+        let max = 0
+        arr.forEach(f => {
+            if (f[1] > max) max = f[1]
+        })
+        let count = []
+        count.length = max + 1
+        count.fill(0)
+
+        arr.forEach(f => {
+            count[f[1]]++
+        })
+        for (let i = 1; i < count.length; i++) {
+            count[i] += count[i - 1]
         }
-        function partition(low, high) {
-            let pivotPos = low + Math.floor((high - low) / 2)
-            let pivot = arr[pivotPos][1]
-            let i = low
-            let j = high
-            while (i <= j) {
-                try {
-                    while (arr[i][1] >= pivot) {
-                        i++
-                    }
-                } catch { }
-                do {
-                    j--
-                } while (arr[j][1] < pivot)
-                if (i <= j) {
-                    swap(i, j)
-                    if (j === pivotPos) pivotPos = i
-                }
-            }
-            swap(pivotPos, j)
-            return j
+        for (let i = arr.length - 1; i >= 0; i--) {
+            output[count[arr[i][1]] - 1] = arr[i]
+            count[arr[i][1]]--
         }
-        function quickSort(low, high) {
-            if (low < high) {
-                let partitionHappenedAt = partition(low, high)
-                quickSort(low, partitionHappenedAt)
-                quickSort(partitionHappenedAt + 1, high)
-            }
+        results = []
+        for (let i = 0; i < output.length; i++) {
+            results.unshift(output[i])
         }
-        quickSort(0, arr.length - 1)
     }
     sort(results)
 
