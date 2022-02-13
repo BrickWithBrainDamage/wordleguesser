@@ -346,7 +346,7 @@ document.addEventListener('keyup', e => {
             clear() :
             e.key.toLowerCase() === 'c' && document.activeElement.tagName !== 'INPUT' ?
                 toggleComputeMode() :
-                e.key.toLowerCase() == 'i' ?
+                e.key.toLowerCase() == 'i' && document.activeElement.tagName !== 'INPUT'?
                     computeWordsWithLetters() :
                     (e.key === 'Backspace' ||
                         /^[a-z\s]$/i.test(e.key)) &&
