@@ -95,7 +95,8 @@ async function promptLength() {
     queryAll('#knownLetters input, #knownIllegalLetters input').forEach(e => e.remove());
     await getLength();
     allInputs = [];
-    allInputsNotLetters = []
+    allInputsNotLetters = [];
+    wordCache = engWords.split('\n').filter(e => e.length == length);
 
     for (let i = 0; i < length; i++) {
         let wordInput = document.createElement('input');
@@ -124,6 +125,8 @@ async function promptLength() {
 promptLength();
 id('changeLength').addEventListener('click', promptLength);
 let lastTime
+let wordCache = []
+
 function compute() {
     let t0 = performance.now()
     queryAll('#possibleWords p, #comWords p').forEach(e => e.remove());
@@ -153,8 +156,8 @@ function compute() {
             })
         })
     }
-    let compiledRegex = new RegExp(`^${regexQuery}$`, 'mgi')
-    let partialResults = engWords.match(compiledRegex)
+    let compiledRegex = new RegExp(`^(?!.+\n)${regexQuery}$`, 'mgi')
+    partialResults = wordCache.filter(e => e.match(compiledRegex)) //much slower method, but ensures that newlines won't be unexpected
     function includeTimes(word, phrase) {
         let index = 0;
         let times = 0;
@@ -168,14 +171,13 @@ function compute() {
     if (partialResults) {
         let results = partialResults.filter(e => {
             for (let item in lettersIn) {
-                if (includeTimes(e, item) < lettersIn[item]) return false;
+                if (/* includeTimes(e, item) < lettersIn[item] */ !e.includes(item)) return false;
             }
             for (let item in lettersNotIn) {
-                let times = includeTimes(e, item);
                 if (lettersFromInput.includes(item) && !computeMode) {
                     if (e.includes(item)) return false;
                 }
-                if (times >= 1 && !letters.includes(item) && !lettersIn.hasOwnProperty(item)) {
+                if (/* includeTimes(e, item) >= 1 */ e.includes(item) && !letters.includes(item) && !lettersIn.hasOwnProperty(item)) {
                     if (e.includes(item)) return false;
                 }
             }
@@ -214,7 +216,7 @@ function postProcess(results) {
         let letterScore = 0
         let lettersEncountered = []
         e.split('').forEach(f => {
-            if (!lettersEncountered.includes(f)) letterScore += Math.floor(letterCount[f] / 100) ?? 0
+            if (!lettersEncountered.includes(f)) letterScore += isNaN(Math.floor(letterCount[f] / 100)) ? 0 : Math.floor(letterCount[f] / 100)
             lettersEncountered.push(f)
         })
         return [e, letterScore]
@@ -253,7 +255,9 @@ function postProcess(results) {
     let wordsDiv = id('possibleWords');
     for (let i = 0; i < 75 && i < results.length; i++) {
         let newp = document.createElement('p');
+        try {
         newp.innerHTML = `${results[i][0]}(Score: ${results[i][1]})`;
+        } catch {console.log(results, i)}
         wordsDiv.appendChild(newp);
     }
 
