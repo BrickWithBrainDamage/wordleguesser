@@ -31,13 +31,13 @@ function getLettersFromHTML() {
                 `[^${allInputsNotLetters[i].value}]` :
                 '.';
     }).join('')
-    /* if (!computeMode) {
+    if (!computeMode) {
         let illegalChars = []
         allInputs.forEach(e => {
             illegalChars.push(`(?!.+^${e.value})`)
         })
         regexQuery = illegalChars.join('') + regexQuery
-    } */
+    }
 }
 let allInputs = [];
 let allInputsNotLetters = [];
@@ -108,16 +108,24 @@ async function promptLength() {
         id("knownLetters").appendChild(wordInput);
 
         let notInput = document.createElement('input');
+
         notInput.classList.add('letter');
-        notInput.addEventListener('focus', _ => {
+        notInput.addEventListener('focus', e => {
             currentFocus = i
         })
         allInputsNotLetters.push(notInput);
 
+        let oldValue
         [wordInput, notInput].forEach(e => {
             e.addEventListener('keydown', function (f) {
-                caretPos = this.selectionStart
+                caretPos = this.selectionStart;
+                oldValue = wordInput.value
             })
+        })
+        wordInput.addEventListener('keyup', e => {
+            if(e.key.match(/^[a-z]$/)) wordInput.value = e.key
+            if(e.key === ' ') wordInput.value = oldValue
+            
         })
         id("knownIllegalLetters").appendChild(notInput);
     }
@@ -156,7 +164,8 @@ function compute() {
             })
         })
     }
-    let compiledRegex = new RegExp(`^(?!.+\n)${regexQuery}$`, 'mgi')
+    let compiledRegex = new RegExp(`^${regexQuery}$`, 'mgi')
+    //partialResults = engWords.match(compiledRegex)
     partialResults = wordCache.filter(e => e.match(compiledRegex)) //much slower method, but ensures that newlines won't be unexpected
     function includeTimes(word, phrase) {
         let index = 0;
@@ -247,7 +256,7 @@ function postProcess(results) {
         }
         
         let returnVal = []
-        for (let i = 0; i < output.length; i++) returnVal.unshift(output[i]);
+        for (let i = 0; i < output.length; i++) returnVal.push(output[i]);
         return returnVal
     }
     results = sort(results);
@@ -292,21 +301,16 @@ function focusCursor(key) {
         if (currentFocus !== null) {
             if (currentFocus <= allInputs.length - 1) {
                 if (document.activeElement.parentNode.id == 'knownLetters') {
-                    if (key === ' ') {
-                        allInputs[currentFocus ?? 0].value = '';
-                    }
                     key === 'Backspace' ? currentFocus >= 1 && caretPos === 0 && currentFocus-- : currentFocus < allInputs.length - 1 && currentFocus++;
+                    if(key === 'ArrowLeft') currentFocus -= 2;
                     if (key === 'Backspace') allInputs[currentFocus].value = '';
                 } else {
-                    try { //if we press space, remove that space char from the middle of div
-                        allInputsNotLetters[currentFocus].value = allInputsNotLetters[currentFocus].value.match(/[^\s]/g).join('')
-                    } catch {
-                        allInputsNotLetters[currentFocus].value = ''
-                    }
                     if (key === ' ' && currentFocus < allInputs.length - 1) currentFocus++
                     if (key === 'Backspace' && currentFocus >= 1 && caretPos === 0) {
                         currentFocus--
-                    }
+                    } else if (key === 'ArrowLeft') {
+                        currentFocus--
+                    } else if (key === 'ArrowRight') currentFocus++
                 }
                 try {
                     document.activeElement.parentNode.id == 'knownLetters' ?
@@ -336,7 +340,7 @@ document.addEventListener('keyup', e => {
                 toggleComputeMode() :
                 e.key.toLowerCase() == 'i' && document.activeElement.tagName !== 'INPUT' ?
                     computeWordsWithLetters() :
-                    (e.key === 'Backspace' ||
+                    (['Backspace', 'ArrowLeft', 'ArrowRight'].includes(e.key) ||
                         /^[a-z\s]$/i.test(e.key)) &&
                     !['illegalLetters', 'lettersInWord', 'inclusiveWordsInput'].includes(document.activeElement.id)
                     && focusCursor(e.key)
