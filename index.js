@@ -341,6 +341,8 @@ function focusCursor(key) {
                     case 'ArrowLeft':
                         decrementFocus()
                         break
+                    case 'ArrowUp':
+                        break
                     case 'ArrowDown':
                         focus = 'knownIllegalLetters'
                         break
@@ -429,6 +431,13 @@ function initBGAnimation() {
             angle: Math.floor(Math.random() * 360),
             travelMultiplier: 1
         }
+        let size = Math.floor(Math.random() * 20) + 25;
+        el.style.transform = `rotate(${Math.random() / 2}turn)`
+
+        el.style.height = `${size}px`;
+        el.style.width = `${size}px`;
+        el.style.fontSize = `${size / 1.5}px`
+        el.style.lineHeight = `${size}px`;
 
         el.style.top = `${objectForEl.x}px`;
         el.style.left = `${objectForEl.y}px`;

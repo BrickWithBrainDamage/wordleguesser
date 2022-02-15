@@ -2,6 +2,8 @@
 *
     margin: 0
     padding: 0
+    &:not(input)
+        user-select: none
 @for $i from 1 through 6
     h#{$i}
         margin-bottom: 3px * (6 - $i)
@@ -21,7 +23,7 @@
 @mixin flexVerticalCenter()
     display: flex
     align-content: center
-@mixin backdropFilter($blur: 5px, $darken: 0%) 
+@mixin backdropFilter($blur: 5px, $darken: 0%)
     background-color: $darkernBG
     @supports (backdrop-filter: blur(5px))
         backdrop-filter: blur(5px) brightness(100% - $darken)
@@ -36,8 +38,11 @@ p
     font-family: $primaryFont
     font-weight: 400
     text-align: center
-#computeTime
-    margin-bottom: 100px
+#words
+    p
+        margin: 0
+    #computeTime
+        margin-bottom: 100px
 h1
     text-align: center
     font-family: $primaryFont
@@ -55,7 +60,7 @@ h1
         height: $divHeight
         line-height: $divHeight
         @include flexVerticalCenter()
-        margin:0
+        margin: 0
 #knownLetters input, #knownIllegalLetters input
     user-select: none
     transition: all 0.3s
@@ -164,19 +169,15 @@ button
     height: 100vh
     width: 100%
     p
-        $size: 25px
-
+        transform-origin: 50% 50%
         font-family: $primaryFont
         position: absolute
         font-size: 18px
         border: solid 2px lighten(black, 50%)
         border-radius: 5px
-        height: $size
-        width: $size
-        line-height: $size
         text-align: center
 #front
-    @include backdropFilter(10px, 20%)
+    @include backdropFilter(10px, 60%)
     input, button
         z-index: 10
     h1
@@ -196,3 +197,6 @@ button
     width: 35px
     transition: transform 1.2s, opacity 0.5s
     z-index: 0
+#words
+    background-color: rgba(250,250,250,0.7)
+    
