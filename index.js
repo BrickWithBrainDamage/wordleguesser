@@ -139,9 +139,6 @@ async function promptLength() {
                 caretPos = this.selectionStart;
                 oldValue = wordInput.value
             })
-            e.addEventListener('keyup', f => {
-                e.value = e.value.match(/[^\s]/g).join('')
-            })
         })
         allInputsNotLetters.push(notInput);
 
@@ -319,6 +316,11 @@ function clear() {
 id('submitSearch').addEventListener('click', compute);
 let currentFocus = null;
 function focusCursor(key) {
+    try {
+    document.activeElement.value = document.activeElement.value.match(/[^\s]/g).join('')
+    } catch {
+        document.activeElement.value = ''
+    }
     if (document.activeElement.id !== 'illegalLetters') {
         if (currentFocus !== null) {
             if (currentFocus <= allInputs.length - 1) {
