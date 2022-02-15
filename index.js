@@ -424,7 +424,7 @@ document.addEventListener('mouseup', e => {
         let diffY = Math.abs(e.clientY - lastMouseY)
         diffPush(diffX, diffY)
         try {
-            lastObjectActive.travelMultiplier = meanMouseMovements.reduce((acc, val) => acc + val) / meanMouseMovements.length * 6
+            lastObjectActive.travelMultiplier = meanMouseMovements.reduce((acc, val) => acc + val) / meanMouseMovements.length * 3
         } catch {
             lastObjectActive.travelMultiplier = 1.2
         }
