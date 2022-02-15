@@ -119,7 +119,6 @@ async function promptLength() {
 
                 newDiv.style.left = `${(bounding.right + bounding.left) / 2 - 17.5}px`
                 newDiv.style.top = `${(bounding.top + bounding.bottom) / 2 - 17.5}px`
-                console.log(e.style.borderColor)
                 newDiv.style.backgroundColor = e.style.borderColor
 
                 id('front').appendChild(newDiv)
@@ -316,35 +315,73 @@ function clear() {
 id('submitSearch').addEventListener('click', compute);
 let currentFocus = null;
 function focusCursor(key) {
+    const incrementFocus = (doICardAboutCaret = true) => currentFocus < allInputs.length - 1 &&
+        (caretPos >= document.activeElement.value.length
+            || !doICardAboutCaret)
+        && currentFocus++
+    const decrementFocus = _ => currentFocus >= 1 && caretPos === 0 && currentFocus--
     try {
-    document.activeElement.value = document.activeElement.value.match(/[^\s]/g).join('')
+        document.activeElement.value = document.activeElement.value.match(/[^\s]/g).join('')
     } catch {
         document.activeElement.value = ''
     }
-    if (document.activeElement.id !== 'illegalLetters') {
-        if (currentFocus !== null) {
-            if (currentFocus <= allInputs.length - 1) {
-                if (document.activeElement.parentNode.id == 'knownLetters') {
-                    key === 'Backspace' ? currentFocus >= 1 && caretPos === 0 && currentFocus-- : currentFocus < allInputs.length - 1 && currentFocus++;
-                    if (key === 'ArrowLeft') currentFocus -= 2;
-                    if (key === 'Backspace') allInputs[currentFocus].value = '';
-                } else {
-                    if (key === ' ' && currentFocus < allInputs.length - 1) currentFocus++
-                    if (key === 'Backspace' && currentFocus >= 1 && caretPos === 0) {
-                        currentFocus--
-                    } else if (key === 'ArrowLeft') {
-                        currentFocus--
-                    } else if (key === 'ArrowRight') currentFocus++
+    let focus
+    if (currentFocus !== null) {
+        if (currentFocus <= allInputs.length - 1) {
+            if (document.activeElement.parentNode.id == 'knownLetters') {
+                focus = 'knownLetters'
+                switch (key) {
+                    case 'Backspace':
+                        decrementFocus()
+                        allInputs[currentFocus].value = '';
+                        break
+                    case 'ArrowRight':
+                        incrementFocus()
+                        break
+                    case 'ArrowLeft':
+                        decrementFocus()
+                        break
+                    case 'ArrowDown':
+                        focus = 'knownIllegalLetters'
+                        break
+                    default:
+                        incrementFocus(false)
+                        break
                 }
-                try {
-                    document.activeElement.parentNode.id == 'knownLetters' ?
-                        allInputs[currentFocus ?? 0].focus() :
-                        allInputsNotLetters[currentFocus ?? 0].focus()
-                } catch { }
+            } else {
+                if (document.activeElement.parentNode.id === 'knownIllegalLetters') {
+                    focus = 'knownIllegalLetters'
+                    switch (key) {
+                        case ' ':
+                            currentFocus < allInputs.length - 1 && currentFocus++
+                            break
+                        case 'Backspace':
+                        case 'ArrowLeft':
+                            decrementFocus()
+                            break
+                        case 'ArrowRight':
+                            incrementFocus()
+                            break
+                        case 'ArrowUp':
+                            focus = 'knownLetters'
+                            break
+                        case 'ArrowDown':
+                            focus = 'notLetters'
+                            break
+                    }
+                } else {
+                    focus = 'notLetters'
+                    if (key == 'ArrowUp') focus = 'knownIllegalLetters'
+                }
             }
-        } else {
-            allInputs[0].focus();
+            focus == 'knownLetters' ?
+                allInputs[currentFocus ?? 0].focus() :
+                focus == 'notLetters' ?
+                    id('illegalLetters').focus() :
+                    allInputsNotLetters[currentFocus ?? 0].focus()
         }
+    } else {
+        allInputs[0].focus();
     }
 }
 let siteInfo = JSON.parse(window.localStorage.getItem('siteInfo')) ?? {
@@ -357,16 +394,16 @@ window.localStorage.setItem('siteInfo', JSON.stringify(siteInfo))
 document.addEventListener('keypress', e => e.key === 'Enter' && !document.activeElement.parentNode.classList.contains('overlayContainer') && compute());
 document.querySelector('#inclusiveWords button').addEventListener('click', computeWordsWithLetters)
 document.addEventListener('keyup', e => {
-    if (!document.activeElement.parentNode.classList.contains('overlayContainer'))
+    if (!document.activeElement.parentNode.classList.contains('overlayContainer')) //good luck
         e.key === 'Escape' ?
             clear() :
             e.key.toLowerCase() === 'c' && document.activeElement.tagName !== 'INPUT' ?
                 toggleComputeMode() :
                 e.key.toLowerCase() == 'i' && document.activeElement.tagName !== 'INPUT' ?
                     computeWordsWithLetters() :
-                    (['Backspace', 'ArrowLeft', 'ArrowRight'].includes(e.key) ||
+                    (['Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key) ||
                         /^[a-z\s]$/i.test(e.key)) &&
-                    !['illegalLetters', 'lettersInWord', 'inclusiveWordsInput'].includes(document.activeElement.id)
+                    !['lettersInWord', 'inclusiveWordsInput'].includes(document.activeElement.id)
                     && focusCursor(e.key);
 });
 
