@@ -36,6 +36,13 @@ h1 {
   text-align: center;
 }
 
+input {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
 #letterInfo div {
   display: flex;
   justify-content: center;
@@ -58,7 +65,7 @@ h1 {
 #possibleWords p, #comWords p {
   box-sizing: content-box;
   margin: 3px;
-  font-family: Raleway;
+  font-family: "Raleway";
   font-size: 18px;
   border: 3px solid #ffb3b3;
 }
@@ -73,9 +80,9 @@ h1 {
 }
 .promptLen .overlayContainer {
   position: relative;
-  left: 50%;
   top: 50vh;
-  transform: translateX(-50%) translateY(-50%);
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
   width: 30%;
   height: 20vh;
   background-color: #ffe6e6;
@@ -84,7 +91,7 @@ h1 {
   text-align: center;
   top: 12px;
   position: relative;
-  font-family: raleway, sans-serif;
+  font-family: "Raleway", sans-serif;
   font-weight: 300;
 }
 .promptLen .overlayContainer input, .promptLen .overlayContainer button {
@@ -97,7 +104,7 @@ button {
   border: 1px solid #ffb3b3;
   padding: 6px;
   margin: 2px 6px;
-  font-family: Raleway, sans-serif;
+  font-family: "Raleway", sans-serif;
   font-weight: 400;
   font-size: 14px;
   cursor: pointer;
@@ -119,12 +126,12 @@ button:hover {
 }
 #pageBottom #otherBtns {
   position: relative;
-  left: 50%;
   display: inline-block;
+  left: 50%;
   transform: translateX(-50%);
 }
 #pageBottom p {
-  font-family: raleway;
+  font-family: "Raleway";
   font-size: 18px;
   text-align: justify;
   width: 40%;
