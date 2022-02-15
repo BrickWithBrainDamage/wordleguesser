@@ -279,7 +279,7 @@ function postProcess(results) {
         }
 
         let returnVal = []
-        for (let i = 0; i < output.length; i++) returnVal.push(output[i]);
+        for (let i = 0; i < output.length; i++) returnVal.unshift(output[i]);
         return returnVal
     }
     results = sort(results);
