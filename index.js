@@ -101,17 +101,40 @@ async function promptLength() {
     for (let i = 0; i < length; i++) {
         let wordInput = document.createElement('input');
         wordInput.classList.add('letter');
-        wordInput.addEventListener('focus', _ => {
-            currentFocus = i
-        })
+        wordInput.style.border = ` 2px dashed rgb(105, 224, 115)`
         allInputs.push(wordInput);
         id("knownLetters").appendChild(wordInput);
 
         let notInput = document.createElement('input');
-
+        notInput.style.border = `2px dashed rgb(223, 221, 26)`
         notInput.classList.add('letter');
-        notInput.addEventListener('focus', e => {
-            currentFocus = i
+        [notInput, wordInput].forEach(e => {
+            e.addEventListener('focus', f => {
+                e.style.transform = 'scale(1.3)'
+                currentFocus = i
+
+                let bounding = e.getBoundingClientRect()
+                let newDiv = document.createElement('div')
+                newDiv.classList.add('explodeScaleOutThing')
+
+                newDiv.style.left = `${(bounding.right + bounding.left) / 2 - 17.5}px`
+                newDiv.style.top = `${(bounding.top + bounding.bottom) / 2 - 17.5}px`
+                console.log(e.style.borderColor)
+                newDiv.style.backgroundColor = e.style.borderColor
+
+                id('front').appendChild(newDiv)
+
+                setTimeout(_ => {
+                    newDiv.style.transform = 'scale(10)'
+                    newDiv.style.opacity = 0
+                })
+                setTimeout(_ => {
+                    newDiv.remove()
+                }, 1300)
+            })
+            e.addEventListener('focusout', f => {
+                e.style.transform = 'scale(1)'
+            })
         })
         allInputsNotLetters.push(notInput);
 
@@ -123,9 +146,9 @@ async function promptLength() {
             })
         })
         wordInput.addEventListener('keyup', e => {
-            if(e.key.match(/^[a-z]$/)) wordInput.value = e.key
-            if(e.key === ' ') wordInput.value = oldValue
-            
+            if (e.key.match(/^[a-z]$/)) wordInput.value = e.key
+            if (e.key === ' ') wordInput.value = oldValue
+
         })
         id("knownIllegalLetters").appendChild(notInput);
     }
@@ -254,7 +277,7 @@ function postProcess(results) {
             output[count[arr[i][1]] - 1] = arr[i];
             count[arr[i][1]]--;
         }
-        
+
         let returnVal = []
         for (let i = 0; i < output.length; i++) returnVal.push(output[i]);
         return returnVal
@@ -265,8 +288,8 @@ function postProcess(results) {
     for (let i = 0; i < 75 && i < results.length; i++) {
         let newp = document.createElement('p');
         try {
-        newp.innerHTML = `${results[i][0]}(Score: ${results[i][1]})`;
-        } catch {console.log(results, i)}
+            newp.innerHTML = `${results[i][0]}(Score: ${results[i][1]})`;
+        } catch { console.log(results, i) }
         wordsDiv.appendChild(newp);
     }
 
@@ -302,7 +325,7 @@ function focusCursor(key) {
             if (currentFocus <= allInputs.length - 1) {
                 if (document.activeElement.parentNode.id == 'knownLetters') {
                     key === 'Backspace' ? currentFocus >= 1 && caretPos === 0 && currentFocus-- : currentFocus < allInputs.length - 1 && currentFocus++;
-                    if(key === 'ArrowLeft') currentFocus -= 2;
+                    if (key === 'ArrowLeft') currentFocus -= 2;
                     if (key === 'Backspace') allInputs[currentFocus].value = '';
                 } else {
                     if (key === ' ' && currentFocus < allInputs.length - 1) currentFocus++
@@ -343,5 +366,168 @@ document.addEventListener('keyup', e => {
                     (['Backspace', 'ArrowLeft', 'ArrowRight'].includes(e.key) ||
                         /^[a-z\s]$/i.test(e.key)) &&
                     !['illegalLetters', 'lettersInWord', 'inclusiveWordsInput'].includes(document.activeElement.id)
-                    && focusCursor(e.key)
+                    && focusCursor(e.key);
 });
+
+const bg = id('bgAnimation');
+let allBG = [];
+
+let time = performance.now();
+
+let lastMouseX;
+let lastMouseY;
+let lastObjectActive;
+let lastActiveIndex;
+function initBGAnimation() {
+    const alphabet = 'qwertyuiopasdfghjklzxcvbnm'.split('');
+    for (let i = 0; i < 50; i++) {
+        let el = document.createElement('p');
+        el.innerHTML = alphabet[Math.floor(Math.random() * alphabet.length)];
+        bg.appendChild(el);
+        let objectForEl = {
+            domElement: el,
+            x: Math.floor(Math.random() * window.innerWidth),
+            y: Math.floor(Math.random() * window.innerHeight),
+            angle: Math.floor(Math.random() * 360),
+            travelMultiplier: 1
+        }
+
+        el.style.top = `${objectForEl.x}px`;
+        el.style.left = `${objectForEl.y}px`;
+        allBG.push(objectForEl);
+    }
+    requestAnimationFrame(bgAnimation);
+}
+document.addEventListener('mousedown', e => {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+    let i = 0
+    for (let item of allBG) {
+        let bounding = item.domElement.getBoundingClientRect()
+        if (e.clientX < bounding.right &&
+            e.clientX > bounding.x &&
+            e.clientY < bounding.bottom &&
+            e.clientY > bounding.top) {
+            console.log(true)
+            lastObjectActive = item
+            lastActiveIndex = i
+            lastMeasure = 0
+            break
+        }
+        i++
+    }
+})
+let meanMouseMovements = []
+document.addEventListener('mouseup', e => {
+    if (lastObjectActive) {
+        let diffX = Math.abs(e.clientX - lastMouseX)
+        let diffY = Math.abs(e.clientY - lastMouseY)
+        diffPush(diffX, diffY)
+        try {
+            lastObjectActive.travelMultiplier = meanMouseMovements.reduce((acc, val) => acc + val) / meanMouseMovements.length * 6
+        } catch {
+            lastObjectActive.travelMultiplier = 1.2
+        }
+        if (lastObjectActive.travelMultiplier < 1) lastObjectActive.travelMultiplier = 1
+        let lastAng = radToDeg(Math.atan(diffY / diffX))
+        if (e.clientX > lastMouseX && e.clientY > lastMouseY) {
+            lastAng += 90
+        } else if (e.clientX < lastMouseX && e.clientY > lastMouseY) {
+            lastAng += 180
+        } else if (e.clientX < lastMouseX && e.clientY < lastMouseY) {
+            lastAng += 270
+        }
+        lastObjectActive.angle = lastAng || lastObjectActive.angle
+        lastObjectActive = null
+        lastActiveIndex = null
+    }
+    lastMeasure = 0
+    meanMouseMovements = []
+})
+
+let lastXmousemove
+let lastYmousemove
+let lastMeasure = performance.now()
+function diffPush(diffX, diffY) {
+    lastMeasure = performance.now()
+    if (lastXmousemove) {
+        let diff = Math.sqrt(
+            diffX ** 2 +
+            diffY ** 2) / 20
+        if (diff > 0.2) meanMouseMovements.push(diff)
+    }
+}
+document.addEventListener('mousemove', e => {
+    if (performance.now() - lastMeasure > 100) {
+        let diffX = Math.abs(e.clientX - lastXmousemove)
+        let diffY = Math.abs(e.clientY - lastYmousemove)
+        diffPush(diffX, diffY)
+    }
+    if (lastObjectActive) {
+        lastObjectActive.x = e.x
+        lastObjectActive.y = e.y
+    }
+    lastXmousemove = e.clientX
+    lastYmousemove = e.clientY
+})
+initBGAnimation()
+const degToRad = deg => deg * (Math.PI / 180);
+const radToDeg = rad => rad * 180 / Math.PI
+function bgAnimation() {
+    let now = performance.now();
+    let deltaTime = time - performance.now();
+    time = now;
+    allBG.forEach((item, index) => {
+        let loopValid = true
+        if (lastActiveIndex) {
+            if (index === lastActiveIndex) loopValid = false
+        }
+        if (loopValid) {
+            let { angle, x, y } = item;
+            const dist = 1;
+            let xTravel = Math.abs(Math.cos(degToRad(angle % 90)) / dist);
+            let yTravel = Math.abs(Math.sin(degToRad(angle % 90)) / dist);
+
+            const travelMultiplier = item.travelMultiplier;
+            if (item.travelMultiplier > 1) {
+                item.travelMultiplier -= 0.2
+                if (item.travelMultiplier < 1) {
+                    item.travelMultiplier = 1
+                }
+            }
+            if (angle < 90) {
+                x += xTravel * travelMultiplier;
+                y -= yTravel * travelMultiplier;
+            } else if (angle < 180) {
+                x += xTravel * travelMultiplier;
+                y += yTravel * travelMultiplier;
+            } else if (angle < 270) {
+                x -= xTravel * travelMultiplier;
+                y += yTravel * travelMultiplier;
+            } else {
+                x -= xTravel * travelMultiplier;
+                y -= yTravel * travelMultiplier;
+            }
+
+            item.x = x;
+            item.y = y;
+
+            const bounceAt = 25
+            let canBounce = item.x > window.innerWidth - bounceAt ||
+                item.x < bounceAt ||
+                item.y < bounceAt ||
+                item.y > window.innerHeight - bounceAt;
+            if (item.bounced) {
+                if (!canBounce) item.bounced = false;
+            }
+            if (canBounce && !item.bounced) {
+                item.angle += 180;
+                item.bounced = true;
+                if (item.angle > 360) item.angle -= 360;
+            }
+        }
+        item.domElement.style.left = `${item.x}px`;
+        item.domElement.style.top = `${item.y}px`;
+    })
+    requestAnimationFrame(bgAnimation);
+}

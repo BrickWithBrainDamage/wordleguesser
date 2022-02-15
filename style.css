@@ -30,17 +30,51 @@ h6 {
 
 p {
   margin: 12px;
+  font-family: "Raleway";
+  font-weight: 400;
+  text-align: center;
+}
+
+#computeTime {
+  margin-bottom: 100px;
 }
 
 h1 {
   text-align: center;
+  font-family: "Raleway";
+  font-weight: 200;
+  color: #5995ED;
+  position: relative;
+  top: 8px;
 }
 
-input {
+#notInWord {
+  margin-top: 24px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  display: flex;
+  align-content: center;
+}
+#notInWord p {
+  height: 30px;
+  line-height: 30px;
+  display: flex;
+  align-content: center;
+  margin: 0;
+}
+
+#knownLetters input, #knownIllegalLetters input {
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+  transition: all 0.3s;
+  z-index: 2;
+}
+#knownLetters input:focus, #knownIllegalLetters input:focus {
+  box-shadow: 2px 2px 32px black;
+  outline: none;
 }
 
 #letterInfo div {
@@ -58,8 +92,10 @@ input {
 
 #possibleWords, #comWords {
   display: flex;
-  justify-content: center;
-  width: 100%;
+  justify-content: space-between;
+  width: 80%;
+  margin: auto;
+  position: relative;
   flex-wrap: wrap;
 }
 #possibleWords p, #comWords p {
@@ -74,9 +110,15 @@ input {
   width: 100%;
   height: 100vh;
   position: fixed;
-  -webkit-backdrop-filter: blur(5px) brightness(0.3);
-          backdrop-filter: blur(5px) brightness(0.3);
+  background-color: rgba(100, 100, 100, 0.5);
   z-index: 15;
+}
+@supports ((-webkit-backdrop-filter: blur(5px)) or (backdrop-filter: blur(5px))) {
+  .promptLen {
+    -webkit-backdrop-filter: blur(5px) brightness(70%);
+            backdrop-filter: blur(5px) brightness(70%);
+    background-color: none;
+  }
 }
 .promptLen .overlayContainer {
   position: relative;
@@ -115,17 +157,31 @@ button:hover {
 }
 
 #pageBottom {
+  background-color: rgba(100, 100, 100, 0.5);
   width: 100%;
+  height: 94px;
   position: fixed;
-  bottom: 12px;
+  bottom: 0;
+}
+@supports ((-webkit-backdrop-filter: blur(5px)) or (backdrop-filter: blur(5px))) {
+  #pageBottom {
+    -webkit-backdrop-filter: blur(5px) brightness(50%);
+            backdrop-filter: blur(5px) brightness(50%);
+    background-color: none;
+  }
 }
 #pageBottom #inclusiveWords {
-  bottom: 50px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: block;
+  bottom: 48px;
   display: flex;
   justify-content: center;
 }
 #pageBottom #otherBtns {
-  position: relative;
+  bottom: 12px;
+  position: absolute;
   display: inline-block;
   left: 50%;
   transform: translateX(-50%);
@@ -151,4 +207,64 @@ button:hover {
 }
 #pageBottom p .wordleCorrect {
   background-color: green;
+}
+
+#bgAnimation {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  position: fixed;
+  filter: blur(2px);
+  top: 0;
+  left: 0;
+  z-index: -10;
+  height: 100vh;
+  width: 100%;
+}
+#bgAnimation p {
+  font-family: "Raleway";
+  position: absolute;
+  font-size: 18px;
+  border: solid 2px gray;
+  border-radius: 5px;
+  height: 25px;
+  width: 25px;
+  line-height: 25px;
+  text-align: center;
+}
+
+#front {
+  background-color: rgba(100, 100, 100, 0.5);
+}
+@supports ((-webkit-backdrop-filter: blur(5px)) or (backdrop-filter: blur(5px))) {
+  #front {
+    -webkit-backdrop-filter: blur(5px) brightness(80%);
+            backdrop-filter: blur(5px) brightness(80%);
+    background-color: none;
+  }
+}
+@supports ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
+  #front h1 {
+    color: #9ec1f4;
+  }
+}
+@supports ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
+  #front #letterInfo p {
+    color: white;
+  }
+}
+
+#comWords p, #possibleWords p {
+  background-color: rgba(100, 100, 100, 0.5);
+}
+
+.explodeScaleOutThing {
+  position: absolute;
+  background-color: white;
+  opacity: 1;
+  height: 35px;
+  width: 35px;
+  transition: transform 1.2s, opacity 0.5s;
+  z-index: 0;
 }/*# sourceMappingURL=style.css.map */

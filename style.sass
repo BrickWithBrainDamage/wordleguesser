@@ -15,17 +15,57 @@
     top: 50vh
     left: 50%
     transform: translateY(-50%) translateX(-50%)
+@mixin flexCenter()
+    display: flex
+    justify-content: center
+@mixin flexVerticalCenter()
+    display: flex
+    align-content: center
+@mixin backdropFilter($blur: 5px, $darken: 0%) 
+    background-color: $darkernBG
+    @supports (backdrop-filter: blur(5px))
+        backdrop-filter: blur(5px) brightness(100% - $darken)
+        background-color: none
+
+$darkernBG: rgba(100,100,100,0.5)
 $primaryFont: 'Raleway'
+$primaryColor: #5995ED
+$secondaryColor: #F3BC7C
 p
     margin: 12px
+    font-family: $primaryFont
+    font-weight: 400
+    text-align: center
+#computeTime
+    margin-bottom: 100px
 h1
     text-align: center
-input
+    font-family: $primaryFont
+    font-weight: 200
+    color: $primaryColor
+    position: relative
+    top: 8px
+#notInWord
+    $divHeight: 30px
+    margin-top: 24px
+    height: $divHeight
+    @include flexCenter()
+    @include flexVerticalCenter()
+    p
+        height: $divHeight
+        line-height: $divHeight
+        @include flexVerticalCenter()
+        margin:0
+#knownLetters input, #knownIllegalLetters input
     user-select: none
+    transition: all 0.3s
+    z-index: 2
+    &:focus
+        box-shadow: 2px 2px 32px black
+        outline: none
 #letterInfo
     div
-        display: flex
-        justify-content: center
+        @include flexCenter()
         .letter
             width: 32px
             height: 32px
@@ -34,8 +74,10 @@ input
         text-align: center
 #possibleWords, #comWords
     display: flex
-    justify-content: center
-    width: 100%
+    justify-content: space-between
+    width: 80%
+    margin: auto
+    position: relative
     flex-wrap: wrap
     p
         box-sizing: content-box
@@ -47,7 +89,7 @@ input
     width: 100%
     height: 100vh
     position: fixed
-    backdrop-filter: blur(5px) brightness(0.3)
+    @include backdropFilter(2px, 30%)
     z-index: 15
     .overlayContainer
         position: relative
@@ -77,15 +119,21 @@ button
         box-shadow: 6px 6px 20px black
         background-color: lighten(blue, 40%)
 #pageBottom
+    @include backdropFilter(4px, 50%)
     width: 100%
+    height: 82px + 12
     position: fixed
-    bottom: 12px
+    bottom: 0
     #inclusiveWords
-        bottom: 50px
-        display: flex
-        justify-content: center
+        position: absolute
+        left: 50%
+        transform: translateX(-50%)
+        display: block
+        bottom: 48px
+        @include flexCenter()
     #otherBtns
-        position: relative
+        bottom: 12px
+        position: absolute
         display: inline-block
         @include centerHorziontal()
     p
@@ -106,3 +154,43 @@ button
             background-color: grey
         .wordleCorrect
             background-color: green
+#bgAnimation
+    user-select: none
+    position: fixed
+    filter: blur(2px)
+    top: 0
+    left: 0
+    z-index: -10
+    height: 100vh
+    width: 100%
+    p
+        $size: 25px
+
+        font-family: $primaryFont
+        position: absolute
+        font-size: 18px
+        border: solid 2px lighten(black, 50%)
+        border-radius: 5px
+        height: $size
+        width: $size
+        line-height: $size
+        text-align: center
+#front
+    @include backdropFilter(10px, 20%)
+    h1
+        @supports (backdrop-filter: blur(3px))
+            color: lighten($primaryColor, 15%)
+    #letterInfo
+        p
+            @supports (backdrop-filter: blur(3px))
+                color: white
+#comWords p, #possibleWords p
+    background-color: $darkernBG
+.explodeScaleOutThing
+    position: absolute
+    background-color: white
+    opacity: 1
+    height: 35px
+    width: 35px
+    transition: transform 1.2s, opacity 0.5s
+    z-index: 0

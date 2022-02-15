@@ -11,17 +11,24 @@
 </head>
 
 <body>
-    <h1>Wordle Guesser</h1>
-    <div id="letterInfo">
-        <p>Letters are in these places (GREEN LETTERS)</p>
-        <div id="knownLetters"></div>
-        <p>These places do NOT have these letters (YELLOW LETTERS)</p>
-        <div id="knownIllegalLetters"></div>
+    <div id="bgAnimation"></div>
+    <div id="front">
+        <h1>Wordle Guesser</h1>
+        <div id="letterInfo">
+            <p>Letters are in these places (GREEN LETTERS)</p>
+            <div id="knownLetters"></div>
+            <p>These places do NOT have these letters (YELLOW LETTERS)</p>
+            <div id="knownIllegalLetters"></div>
+        </div>
+    
+        <div id="notInWord">
+            <p>Letters not in word (GREY LETTERS)</p>
+            <input type="text" id="illegalLetters">
+            <button id="submitSearch">Submit guess!</button>
+        </div>
     </div>
+    
 
-    <p>Letters not in word (GREY LETTERS)</p>
-    <input type="text" id="illegalLetters">
-    <button id="submitSearch">Submit guess!</button>
     <div id="possibleWords"></div>
     <p id="addWords"></p>
     <div id="comWords"></div>
