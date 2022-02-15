@@ -135,20 +135,19 @@ async function promptLength() {
             e.addEventListener('focusout', f => {
                 e.style.transform = 'scale(1)'
             })
-        })
-        allInputsNotLetters.push(notInput);
-
-        let oldValue
-        [wordInput, notInput].forEach(e => {
             e.addEventListener('keydown', function (f) {
                 caretPos = this.selectionStart;
                 oldValue = wordInput.value
             })
+            e.addEventListener('keyup', f => {
+                e.value = e.value.match(/[^\s]/g).join('')
+            })
         })
+        allInputsNotLetters.push(notInput);
+
+        let oldValue
         wordInput.addEventListener('keyup', e => {
             if (e.key.match(/^[a-z]$/)) wordInput.value = e.key
-            if (e.key === ' ') wordInput.value = oldValue
-
         })
         id("knownIllegalLetters").appendChild(notInput);
     }
