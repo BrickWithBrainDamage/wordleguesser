@@ -244,6 +244,9 @@ button:hover {
     background-color: none;
   }
 }
+#front input, #front button {
+  z-index: 10;
+}
 @supports ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
   #front h1 {
     color: #9ec1f4;

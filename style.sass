@@ -177,6 +177,8 @@ button
         text-align: center
 #front
     @include backdropFilter(10px, 20%)
+    input, button
+        z-index: 10
     h1
         @supports (backdrop-filter: blur(3px))
             color: lighten($primaryColor, 15%)
