@@ -28,6 +28,7 @@ Take the situation []IGHT. Words such as SIGHT, FIGHT, LIGHT, MIGHT, and many mo
 <br>
 **Compute Inclusive Words** will find all words have the letters given to the program. In the above example, you can enter *sflm* into the input, then click the button. The program will then tell you that the word *films* contains all of these letters. Now you can enter *films* into Wordle and it will tell you information for all of these words! You've just turned a 4 guesses process into a 2 guesses process.
 ## Console App
+**Note: The console app is outdated and is not recommended for use!**
 Install node.js, cd to the directory of the console app in ./console, and run node index.js
 <br>
 This is the first version of this app, before I moved on to the web version. This version doesn't make full use of the information (if a A is yellow, it only knows that a word contains an A, not where an A is), and is quite prone to human error. Take the following steps
