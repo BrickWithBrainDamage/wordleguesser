@@ -39,7 +39,7 @@ function generateRegexAndSearch() {
                 if (includeTimes(e, item) < includesLetters[item]) return false
             }
             for (let item in illegalLetters) {
-                if (includeTimes(e, item) == illegalLetters[item]) return false
+                if (e.includes(item) && !includesLetters.hasOwnProperty(item)) return false
             }
             return true
         })
@@ -100,16 +100,16 @@ async function getInfo() {
     let outputStr = ''
     for (let i = 0; i < 10 && i < results.length; i++) {
         let temp = ''
-        for (let j = 0; j < 10 && j + i < results.length; j++) {
+        for (let j = 0; j < 7 && j + i < results.length; j++) {
             temp += `${results[i + j]}\x1b[5C`
         }
         outputStr += `${temp}\n`
     }
     console.log(`\n${COLORS.blueViolet}${outputStr}${COLORS.reset}`)
-    if (results.length <= 100) {
+    if (results.length <= 70) {
         console.log(`${COLORS.electricBlue}${results.length} words found${COLORS.reset}`)
     } else {
-        console.log(`${COLORS.electricBlue}Found \x1b[1m${results.length} words\x1b[0m${COLORS.electricBlue}, but only 100 are shown${COLORS.reset}`)
+        console.log(`${COLORS.electricBlue}Found \x1b[1m${results.length} words\x1b[0m${COLORS.electricBlue}, but only 70 are shown${COLORS.reset}`)
     }
     console.log(`Illegal letters: ${JSON.stringify(illegalLetters)}`)
     console.log(`Letters in the word: ${JSON.stringify(includesLetters)}`)
