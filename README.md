@@ -44,4 +44,5 @@ This is the first version of this app, before I moved on to the web version. Thi
 Suddenly the word 'doubted' is eliminated from the words that is returned (meaning you'll never win) because it sees that any word which has an 'O' in it is greyed out, and therefore is illegal to use. Unfortunately, wordle actually indicates the SECOND O, meaning you still have an O, but the program does not know that!
 ## Attributions
 https://github.com/dwyl/english-words/ -- list of all english words
+<br>
 https://github.com/dariusk/corpora/blob/master/data/words/common.json -- common english words
